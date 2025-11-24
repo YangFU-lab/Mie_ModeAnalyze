@@ -3,6 +3,21 @@
 
 基于Mie散射理论，分解并分析球形粒子散射中各个电偶极和磁偶极模式的贡献。
 
+## 作者信息
+
+- **姓名**: Yang FU
+- **研究网站**: [https://yfu-research.com/](https://yfu-research.com/)
+
+## 引用
+
+如果您在研究中使用了本代码，请引用以下文献，十分感谢：
+
+**1. Fu, Y., An, Y., Xu, Y., Dai, J. G., & Lei, D. (2022). Polymer coating with gradient‐dispersed dielectric nanoparticles for enhanced daytime radiative cooling. *EcoMat*, 4(2), e12169.**  
+https://doi.org/10.1002/eom2.12169
+
+**2. Abou-Hamdan, L., Coudrat, L., Bidault, S., Krachmalnicoff, V., Haïdar, R., Bouchon, P., & De Wilde, Y. (2022). Transition from phononic to geometrical mie modes measured in single subwavelength polar dielectric spheres. *ACS photonics*, 9(7), 2295-2303.**  
+https://doi.org/10.1021/acsphotonics.2c00273
+
 ## 功能
 
 - 计算总散射截面和吸收截面
@@ -93,10 +108,3 @@ k_particle = TiO2_k(lamda);
 ## 参考文献
 
 - Bohren, C. F., & Huffman, D. R. (1983). *Absorption and Scattering of Light by Small Particles*. Wiley.
-
-## 作者
-
-**Yang FU**  
-Postdoc Researcher, City University of Hong Kong
-
-🔗 [Research Website](https://yfu-research.com/)
