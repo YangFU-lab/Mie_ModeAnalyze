@@ -1,91 +1,80 @@
 function result = Mie(m, x)
+%% ========================================================================
+% Mie散射效率计算
+% 功能：计算球形粒子的Mie散射效率（消光、散射、吸收等）
+% ========================================================================
+% 输入参数：
+%   m - 相对折射率（复数，m'+im"），相对于周围介质
+%   x - 尺寸参数（x = 2πn_medium*a/λ），a为粒子半径，λ为波长
+% 输出参数：
+%   result - [qext, qsca, qabs, qb, asy, qratio]
+%            qext: 消光效率, qsca: 散射效率, qabs: 吸收效率
+%            qb: 后向散射效率, asy: 不对称参数, qratio: 后向散射比
+% ========================================================================
+% 参考文献：Bohren & Huffman (1983) BEWI:TDD122, p. 103,119-122,477
+% 使用Mie_ab函数计算Mie系数an和bn
+% ========================================================================
 
-% Computation of Mie Efficiencies for given 
-
-% complex refractive-index ratio m=m'+im" 
-
-% and size parameter x=k0*a, where k0= wave number in ambient 
-
-% medium, a=sphere radius, using complex Mie Coefficients
-
-% an and bn for n=1 to nmax,
-
-% s. Bohren and Huffman (1983) BEWI:TDD122, p. 103,119-122,477.
-
-% Result: m', m", x, efficiencies for extinction (qext), 
-
-% scattering (qsca), absorption (qabs), backscattering (qb), 
-
-% asymmetry parameter (asy=<costeta>) and (qratio=qb/qsca).
-
-% Uses the function "Mie_ab" for an and bn, for n=1 to nmax.
-
-% C. M�tzler, May 2002, revised July 2002.
-
-
-
-if x==0                 % To avoid a singularity at x=0
-
+% ========== 特殊情况处理 ==========
+if x==0
+    % 尺寸参数为零：避免奇点
     result=[0 0 0 0 0 1.5];
-
-elseif x>0              % This is the normal situation
-
+elseif x>0
+    % ========== 正常情况：计算Mie效率 ==========
+    
+    % 计算所需的最大模式数
     nmax=round(2+x+4*x.^(1/3));
-
     n1=nmax-1;
-
-    n=(1:nmax);cn=2*n+1; c1n=n.*(n+2)./(n+1); c2n=cn./n./(n+1);
-
+    n=(1:nmax);
+    cn=2*n+1;  % 权重系数
+    c1n=n.*(n+2)./(n+1);
+    c2n=cn./n./(n+1);
     x2=x.*x;
-
+    
+    % 调用Mie_ab函数计算Mie系数
     f=Mie_ab(m,x);
-
-    anp=(real(f(1,:))); anpp=(imag(f(1,:)));
-
-    bnp=(real(f(2,:))); bnpp=(imag(f(2,:)));
-
-    g1(1:4,nmax)=[0; 0; 0; 0]; % displaced numbers used for
-
-    g1(1,1:n1)=anp(2:nmax);    % asymmetry parameter, p. 120
-
+    
+    % 提取Mie系数的实部和虚部
+    anp=(real(f(1,:)));   % an系数实部
+    anpp=(imag(f(1,:)));  % an系数虚部
+    bnp=(real(f(2,:)));   % bn系数实部
+    bnpp=(imag(f(2,:)));  % bn系数虚部
+    
+    % 准备计算不对称参数所需的数组
+    g1(1:4,nmax)=[0; 0; 0; 0];
+    g1(1,1:n1)=anp(2:nmax);
     g1(2,1:n1)=anpp(2:nmax);
-
     g1(3,1:n1)=bnp(2:nmax);
-
     g1(4,1:n1)=bnpp(2:nmax);   
-
+    
+    % ========== 计算消光效率 ==========
     dn=cn.*(anp+bnp);
-
     q=sum(dn);
-
-    qext=2*q/x2;% extinction efficiency
-
+    qext=2*q/x2;
+    
+    % ========== 计算散射效率 ==========
     en=cn.*(anp.*anp+anpp.*anpp+bnp.*bnp+bnpp.*bnpp);
-
     q=sum(en);
-
-    qsca=2*q/x2;% scattering efficiency
-
-    qabs=qext-qsca;%absorption efficiency
-
+    qsca=2*q/x2;
+    
+    % ========== 计算吸收效率 ==========
+    qabs=qext-qsca;
+    
+    % ========== 计算后向散射效率 ==========
     fn=(f(1,:)-f(2,:)).*cn;
-
     gn=(-1).^n;
-
     f(3,:)=fn.*gn;
-
     q=sum(f(3,:));
-
-    qb=q*q'/x2;% backscattering efficiency
-
+    qb=q*q'/x2;
+    
+    % ========== 计算不对称参数 ==========
     asy1=c1n.*(anp.*g1(1,:)+anpp.*g1(2,:)+bnp.*g1(3,:)+bnpp.*g1(4,:));
-
     asy2=c2n.*(anp.*bnp+anpp.*bnpp);
-
-    asy=4/x2*sum(asy1+asy2)/qsca;% asymmetry parameter
-
-    qratio=qb/qsca;% reflectivity?
-
+    asy=4/x2*sum(asy1+asy2)/qsca;
+    
+    % ========== 计算后向散射比 ==========
+    qratio=qb/qsca;
+    
+    % 返回结果
     result=[qext qsca qabs qb asy qratio];
-
 end
